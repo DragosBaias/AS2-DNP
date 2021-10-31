@@ -1,0 +1,45 @@
+﻿@page "/Login"
+@using FamilyManager2UI.Data
+@inject NavigationManager _navigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card w-50">
+        <h4 class="card-header">Login</h4>
+        <div class="card-body">
+            <NotAuthorized >
+                <div class="form-group">
+                    <label>Username</label>
+                    <input class="form-control" type="text" placeholder="Username" @bind-value="_username"/>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input class="form-control" type="Password" placeholder="Password" @bind-value="_password"/>
+                </div>
+                <div style="color:red">@_errorMessage</div>
+                <button class=" btn btn-primary mr-1" @onclick="PerformLogin">Login</button>
+                <NavLink href="/Register" class="btn btn-link">Register</NavLink>
+            </NotAuthorized>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _username;
+    private string _password;
+    private string _errorMessage;
+
+    public async Task PerformLogin() {
+        _errorMessage = "";
+        try {
+            await ((CustomAuthenticationStateProvider)_authenticationStateProvider).ValidateLogin(_username, _password);
+            _username = "";
+            _password = "";
+            _navigationManager.NavigateTo("/FamilyList");
+        }
+        catch (Exception e) {
+            _errorMessage = e.Message;
+        }
+    }
+}

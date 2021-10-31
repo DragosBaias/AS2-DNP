@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "VyCK7Ufb9yiGYw3wTaGFfdlsfY6CN0uoUKYhqw7lW6PhxD/OPObTeAmkqpxZILqJ4E10eDiCZccdcm0ktjHVkw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Dragos\\Desktop\\Downloads\\DNP-assignment 2\\DNP-assignment2-main\\FamilyManager2\\FamilyManagerWebAPI\\FamilyManagerWebAPI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Dragos\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
+    "C:\\Users\\Dragos\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\Dragos\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
+    "C:\\Users\\Dragos\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
+    "C:\\Users\\Dragos\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
+    "C:\\Users\\Dragos\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512"
+  ],
+  "logs": []
+}

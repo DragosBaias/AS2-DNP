@@ -1,0 +1,303 @@
+﻿@page "/Family/{address}/{number:int}"
+@using Data;
+@using Models;
+@using FamilyManager2UI.WebClient
+@inject NavigationManager _navigationManager;
+@inject IRestClient _restClient;
+@inherits MainLayout ;
+<!-- role, name, age, pets if any, id, age, sex -->
+
+
+<div id="carousel_family" class="carousel slide d-flex justify-content-center " data-ride="carousel">
+    <!-- carousel details-->
+    <ol class="carousel-indicators">
+
+        <li data-target="#carousel_family" data-slide-to="0" class="@_firstSlide"></li>
+        <li data-target="#carousel_family" data-slide-to="1" class="@_secondSlide"></li>
+    </ol>
+    <a class="carousel-control-prev" role="button" data-slide="prev" @onclick="@(()=>Manually(false))">
+        <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: #3a0647;"></span>
+    </a>
+    <!--carousel inner-->
+    
+    <div class="carousel-inner col-9">
+        <!--controls - have to be fixed -->
+        <!--slide 1-->
+        <div class="carousel-item @_firstSlide" id="family-slide">
+            @if (_family != null) {
+                <h1>@_family.GetUniqueKey()</h1>
+            }
+            <p>Search for a particular member: <input type="text" @oninput="@((arg) => FilterByName(arg))" style="width: 200px"/></p>
+            <div class="d-flex justify-content-between mb-2">
+                <div>
+                    Filter by role:
+                    <select name="role" @oninput="@((arg) => FilterByRole(arg))">
+                        <option value="all">All</option>
+                        <option value="adult">Adult</option>
+                        <option value="child">Child</option>
+                    </select>
+                </div>
+                <AuthorizeView Policy="@Policies.IsAdmin">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn mx-auto" @onclick="@(() => RemoveFamilyAsync())">
+                            <i class="oi oi-trash" style="color:red"></i>
+                        </button>
+                    </div>
+                </AuthorizeView>
+            </div>
+            
+                        
+            @if (_filteredFamilyMembers == null) {
+                <p>
+                    <em> Loading ...</em>
+                </p>
+            }
+            else if (!_filteredFamilyMembers.Any()) {
+                <p>
+                    <em>This family doesn't have any members yet</em>
+                </p>
+            }
+            else {
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th @onclick="SortByFirstName">First Name</th>
+                        <th @onclick="SortByLastName">Last Name</th>
+                        <th>Role</th>
+                        <th>Age</th>
+                        <th>Sex</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in _filteredFamilyMembers) {
+                        <tr class="family-row" @onclick="@(() => View(item.Id, item.FirstName, item.LastName))">
+                            <td>@item.Id</td>
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+                            @if (item is Child) {
+                                <td>Child</td>
+                            }
+                            else {
+                                <td>Adult</td>
+                            }
+                            <td>@item.Age</td>
+                            <td>@item.Sex</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <!-- slide 2-->
+        <div class="carousel-item @_secondSlide" id="pet-slide">
+            @if (_family != null) {
+                <h1>@_family.GetUniqueKey()'s Pets</h1>
+            }
+            @if (_filteredPets == null) {
+                <p>
+                    <em> Loading ...</em>
+                </p>
+            }
+            else if (!_pets.Any()) {
+                <p>
+                    <em>This family doesn't have pets yet</em>
+                </p>
+                <img src="Images/birdMemeCs.png" width="500px" height="500px" alt ="meme"><br/>
+            }
+            else {
+                <p>Search for a particular pet: <input type="text" @oninput="@((arg) => FilterByPetName(arg))" style="width: 200px"/></p>
+                <p>
+                    Filter by species:
+                    <select name="species" @oninput="@((arg) => FilterBySpecies(arg))">
+                        <option value="all">All</option>
+                        <option value="dog">Dog</option>
+                        <option value="cat">Cat</option>
+                        <option value="other">Other</option>
+                    </select>
+                </p>
+                <table class="table ">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th @onclick="SortByPetName">Name</th>
+                        <th>Species</th>
+                        <th>Age</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in _filteredPets) {
+                        <tr class="family-row" @onclick="@(() => ViewPet(item.Id))">
+                            <td>@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@item.Species</td>
+                            <td>@item.Age</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+    </div>
+    <a class="carousel-control-next" role="button" data-slide="next" @onclick="@(()=>Manually(true))">
+        <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: #3a0647"></span>
+    </a>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string Address { get; set; }
+
+    [Parameter]
+    public int Number { get; set; }
+
+    private Family _family;
+    private IList<Person> _familyMembers;
+    private IList<Person> _filteredFamilyMembers;
+
+    private IList<Pet> _pets;
+    private IList<Pet> _filteredPets;
+
+
+    //carousel stuff
+    string _firstSlide = "active";
+    string _secondSlide = "";
+
+    int _currentPosition = 0;
+    int _currentSlide = 0;
+
+    protected override async Task OnInitializedAsync() {
+        _family = await _restClient.GetAsync<Family>(Address,Number);
+        _familyMembers = _family.GetAllMembers();
+        _filteredFamilyMembers = _familyMembers;
+
+        _pets = _family.Pets;
+        _filteredPets = _pets;
+    }
+
+    public void Manually(bool backwards) {
+        if (backwards) {
+            _currentPosition--;
+            _filteredPets = _pets;
+            _filteredFamilyMembers = _familyMembers;
+        }
+        else {
+            _currentPosition++;
+            _filteredPets = _pets;
+            _filteredFamilyMembers = _familyMembers;
+        }
+
+        ChangeSlide();
+    }
+
+
+    private void ChangeSlide() {
+        _currentSlide = Math.Abs(_currentPosition % 2);
+
+        switch (_currentSlide) {
+            case 0:
+                _firstSlide = "active";
+                _secondSlide = "";
+                break;
+            case 1:
+                _firstSlide = "";
+                _secondSlide = "active";
+                break;
+        }
+    }
+
+    private void FilterByName(ChangeEventArgs changeEventArgs) {
+        List<Person> people = new List<Person>();
+        foreach (var person in _family.GetAllMembers()) {
+            if (person.FirstName.ToLower().Contains(changeEventArgs.Value.ToString().ToLower()) || person.LastName.ToLower().Contains(changeEventArgs.Value.ToString().ToLower()))
+                people.Add(person);
+        }
+        _filteredFamilyMembers = people;
+    }
+
+    private void FilterByRole(ChangeEventArgs changeEventArgs) {
+        List<Person> people = new List<Person>();
+        if (changeEventArgs.Value.ToString().Equals("child")) {
+            foreach (var person in _family.Children) {
+                people.Add(person);
+            }
+        }
+        else if (changeEventArgs.Value.ToString().Equals("adult")) {
+            foreach (var person in _family.Adults) {
+                people.Add(person);
+            }
+        }
+        else if (changeEventArgs.Value.ToString().Equals("all")) {
+            people = _familyMembers.ToList();
+        }
+        _filteredFamilyMembers = people;
+    }
+
+    private void SortByFirstName() {
+        var sort = _filteredFamilyMembers.OrderBy(name => name.FirstName);
+        _filteredFamilyMembers = sort.ToList();
+    }
+
+    private void SortByLastName() {
+        var sort = _filteredFamilyMembers.OrderBy(name => name.LastName);
+        _filteredFamilyMembers = sort.ToList();
+    }
+
+    private void View(int id, string firstName, string lastName) {
+        _navigationManager.NavigateTo($"Person/{id}/{firstName}/{lastName}");
+    }
+
+    private void FilterByPetName(ChangeEventArgs changeEventArgs) {
+        List<Pet> pets = new List<Pet>();
+        foreach (var pet in _family.Pets) {
+            if (pet.Name.ToLower().Contains(changeEventArgs.Value.ToString().ToLower()))
+                pets.Add(pet);
+        }
+        _filteredPets = pets;
+    }
+
+    private void FilterBySpecies(ChangeEventArgs changeEventArgs) {
+        List<Pet> pets = new List<Pet>();
+        if (changeEventArgs.Value.ToString().Equals("cat")) {
+            foreach (var pet in _family.Pets) {
+                if(pet.Species.ToLower().Equals("cat"))
+                    pets.Add(pet);
+            }
+        }
+        else if (changeEventArgs.Value.ToString().Equals("dog")) {
+            foreach (var pet in _family.Pets) {
+                if(pet.Species.ToLower().Equals("dog"))
+                    pets.Add(pet);
+            }
+        }
+        else if (changeEventArgs.Value.ToString().Equals("other")) {
+            foreach (var pet in _family.Pets) {
+                if(!pet.Species.ToLower().Equals("cat") && !pet.Species.ToLower().Equals("dog"))
+                    pets.Add(pet);
+            }
+        }
+        else if (changeEventArgs.Value.ToString().Equals("all")) {
+            pets = _family.Pets;
+        }
+        _filteredPets = pets;
+    }
+
+    private void SortByPetName() {
+        var sort = _filteredPets.OrderBy(name => name.Name);
+        _filteredPets = sort.ToList();
+    }
+
+
+    private void ViewPet(int itemId) {
+        _navigationManager.NavigateTo($"PetDetails/{itemId}");
+    }
+    
+    private async Task RemoveFamilyAsync() {
+        await _restClient.DeleteAsync<Family>(Address,Number);
+        _navigationManager.NavigateTo("/FamilyList");
+    }
+
+}

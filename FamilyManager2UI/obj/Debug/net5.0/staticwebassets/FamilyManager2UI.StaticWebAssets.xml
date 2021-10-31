@@ -1,0 +1,4 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="_content/Radzen.Blazor" Path="C:\Users\Dragos\.nuget\packages\radzen.blazor\3.11.1\build\..\staticwebassets\" />
+  <ContentRoot BasePath="/" Path="C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManager2UI\obj\Debug\net5.0\scopedcss\bundle\" />
+</StaticWebAssets>

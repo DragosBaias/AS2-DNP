@@ -1,0 +1,239 @@
+﻿@page "/Addmember/{streetName}/{houseNumber:int}/{type}"
+@using Data;
+@using FamilyManager2UI.WebClient
+@using Models
+@inject NavigationManager _navMng;
+@inject IRestClient _restClient;
+<div class="text-center">
+    <h3>Add a New @Type</h3>
+</div>
+
+@if (Type.Equals("Pet")) {
+    <div class="container text-center">
+    <div class="card text-center py-3">
+        <EditForm Model="@_pet" OnValidSubmit="@AddPetAsync">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            @if (_family.Children != null) {
+            <label>Child:</label>
+                <div class="form-group">
+                    <InputSelect name="child" @bind-Value="_person.FirstName">
+                        <option value="None">None</option>
+                    
+                        @foreach (var child in _family.Children) {
+                            <option value="@child.FirstName"> @child.FirstName</option>
+                        }
+                    </InputSelect>
+                </div>
+            }
+            <label>Name:</label>
+            <div class="form-group">
+                <InputText @bind-Value="_pet.Name"/>
+            </div>
+            <label>Species:</label>
+            <div class="form-group">
+                <InputText @bind-Value="_pet.Species"/>
+            </div>
+            <label>Age:</label>
+            <div class="form-group">
+                <InputNumber @bind-Value="_pet.Age"/>
+            </div>
+            <p class="actions">
+                <button class="btn btn-outline-dark" type="submit">Add Pet</button>
+            </p>
+        </EditForm>
+    </div>
+    </div>
+} else {
+    <EditForm Model="@_person" OnValidSubmit="@AddPersonAsync">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="container text-center">
+        <div class="card text-center py-3">
+            <div class="row">
+                <div class="offset-md-3 col-md-3 text-center">
+                    <div class="mb-5 mt-4">
+                        <label>First Name:</label>
+                        <div class="form-group">
+                            <InputText @bind-Value="_person.FirstName"/>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <label>Last Name:</label>
+                        <div class="form-group">
+                            <InputText @bind-Value="_person.LastName"/>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <label>Hair color:</label>
+                        <div class="form-group">
+                            <InputSelect name="hair_color" @bind-Value="_person.HairColor">
+                                <option value="Black">Black</option>
+                                <option value="Grey">Grey</option>
+                                <option value="Blond">Blond</option>
+                                <option value="Leverpostej">Leverpostej</option>
+                                <option value="White">White</option>
+                                <option value="Blue">Blue</option>
+                            </InputSelect >
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <label>Eye color:</label>
+                        <div class="form-group">
+                            <InputSelect name="eye_color" @bind-Value="_person.EyeColor">
+                                <option value="Blue">Blue</option>
+                                <option value="Hazel">Hazel</option>
+                                <option value="Grey">Grey</option>
+                                <option value="Amber">Amber</option>
+                                <option value="Brown">Brown</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <label>Age:</label>
+                        <div class="form-group">
+                            <InputNumber @bind-Value="_person.Age"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="mb-5 mt-4">
+                        <label>Height:</label>
+                        <div class="form-group">
+                            <InputNumber @bind-Value="_person.Height"/>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+
+                        <label>Weight:</label>
+                        <div class="form-group">
+                            <InputNumber @bind-Value="_person.Weight"/>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <label>Sex:</label>
+                        <div class="form-group">
+                            <InputSelect name="Sex" @bind-Value="_person.Sex">
+                                <option value="F">F</option>
+                                <option value="M">M</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                    @if (Type.Equals("Adult")) {
+                        <EditForm Model="@_job" Context="j">
+                            <div class="mb-5">
+                                <label>Job title:</label>
+                                <div class="form-group">
+                                    <InputText @bind-Value="_job.JobTitle"/>
+                                </div>
+                            </div>
+                            <div class="mb-5">
+                                <label>Salary:</label>
+                                <div class="form-group">
+                                    <InputNumber @bind-Value="_job.Salary"/>
+                                </div>
+                            </div>
+                        </EditForm>
+                    }
+                    else {
+                        <EditForm Model="@_interest" Context="i">
+                            <div class="mb-5">
+                                <label>Interest Type:</label>
+                                <div class="form-group">
+                                    <InputText @bind-Value="_interest.Type"/>
+                                </div>
+                            </div>
+                            <div class="mb-5">
+                                <label>Interest Description:</label>
+                                <div class="form-group">
+                                    <InputText @bind-Value="_interest.Description"/>
+                                </div>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+                <div class="col-md-3"></div>
+                <p class="actions mx-auto">
+                    <button class="btn btn-outline-dark" type="submit">Add Person</button>
+                </p>
+            </div>
+        </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public string StreetName { get; set; }
+
+    [Parameter]
+    public int HouseNumber { get; set; }
+
+    [Parameter]
+    public string Type { get; set; }
+
+    private Family _family = new Family();
+
+    private Person _person = new Person();
+    private Pet _pet = new Pet();
+    private Job _job = new Job();
+    private Interest _interest = new Interest();
+    private string _hairColor;
+    private string _eyeColor;
+    private string _sex;
+
+    protected override async Task OnInitializedAsync() {
+        _family = await _restClient.GetAsync<Family>(StreetName, HouseNumber);
+        _person.HairColor = "Black";
+        _person.EyeColor = "Blue";
+        _person.Sex = "F";
+    }
+
+    private async Task AddPetAsync() {
+        if (_person.FirstName != null && !_person.FirstName.Equals("None"))
+            await _restClient.PostAsync(_pet, _family.StreetName, _family.HouseNumber, _family.Children.First(c => c.FirstName.Equals(_person.FirstName)).Id);
+        else
+            await _restClient.PostAsync(_pet, _family.StreetName, _family.HouseNumber);
+        _navMng.NavigateTo("/AddFamilyMember");
+    }
+
+    private async Task AddPersonAsync() {
+        if (Type.Equals("Adult")) {
+            await _restClient.PostAsync(new Adult() {
+                FirstName = _person.FirstName,
+                LastName = _person.LastName,
+                EyeColor = _person.EyeColor,
+                HairColor = _person.HairColor,
+                Age = _person.Age,
+                Height = _person.Height,
+                Weight = _person.Weight,
+                Sex = _person.Sex,
+                JobTitle = new Job() {
+                    JobTitle = _job.JobTitle,
+                    Salary = _job.Salary
+                }
+            }, _family.StreetName,_family.HouseNumber);
+        }
+        else {
+            await _restClient.PostAsync(new Child() {
+                FirstName = _person.FirstName,
+                LastName = _person.LastName,
+                EyeColor = _person.EyeColor,
+                HairColor = _person.HairColor,
+                Age = _person.Age,
+                Height = _person.Height,
+                Weight = _person.Weight,
+                Sex = _person.Sex,
+                Pets = new List<Pet>(),
+                Interests = new List<Interest>() {
+                    new Interest() {
+                        Description = _interest.Description,
+                        Type = _interest.Type
+                    }
+                }
+            }, _family.StreetName,_family.HouseNumber);
+        }
+        _navMng.NavigateTo("/AddFamilyMember");
+    }
+}            

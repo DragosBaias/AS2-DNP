@@ -1,0 +1,12 @@
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\bin\Debug\net5.0\FamilyManagerClassLibrary.deps.json
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\bin\Debug\net5.0\FamilyManagerClassLibrary.dll
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\bin\Debug\net5.0\ref\FamilyManagerClassLibrary.dll
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\bin\Debug\net5.0\FamilyManagerClassLibrary.pdb
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.csproj.AssemblyReference.cache
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.AssemblyInfoInputs.cache
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.AssemblyInfo.cs
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.csproj.CoreCompileInputs.cache
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.dll
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\ref\FamilyManagerClassLibrary.dll
+C:\Users\Dragos\Desktop\Downloads\DNP-AS-2-main\DNP-AS-2-main\FamilyManager2\FamilyManagerClassLibrary\obj\Debug\net5.0\FamilyManagerClassLibrary.pdb

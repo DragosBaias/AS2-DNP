@@ -1,0 +1,58 @@
+[
+  {
+    "StreetName": "Street Test",
+    "HouseNumber": 10,
+    "Adults": [
+      {
+        "JobTitle": {
+          "JobTitle": "Worker",
+          "Salary": 30000
+        },
+        "Id": 1,
+        "FirstName": "TestAdult",
+        "LastName": "TestAdult",
+        "HairColor": "Leverpostej",
+        "EyeColor": "Brown",
+        "Age": 27,
+        "Weight": 70,
+        "Height": 176,
+        "Sex": "M"
+      }
+    ],
+    "Children": [
+      {
+        "Interests": [
+          {
+            "Type": "Trappereala",
+            "Description": "Skrrrrr"
+          }
+        ],
+        "Pets": [
+          {
+            "Id": 8,
+            "Species": "Dog",
+            "Name": "Dog",
+            "Age": 1
+          }
+        ],
+        "Id": 1,
+        "FirstName": "Rich",
+        "LastName": "The Kid",
+        "HairColor": "Blue",
+        "EyeColor": "Blue",
+        "Age": 15,
+        "Weight": 69,
+        "Height": 169,
+        "Sex": "M"
+      }
+    ],
+    "Pets": [
+      {
+        "Id": 8,
+        "Species": "Dog",
+        "Name": "Doog",
+        "Age": 1
+      }
+    ]
+  }
+]

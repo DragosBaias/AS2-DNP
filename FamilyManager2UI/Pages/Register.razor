@@ -1,0 +1,54 @@
+﻿@page "/Register"
+@using FamilyManager2UI.Data
+@using FamilyManager2UI.WebClient
+@inject NavigationManager _navigationManager
+@inject IRestClient _restClient;
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+
+<div class="d-flex justify-content-center align-self-center">
+<div class="card w-50" >
+    <h4 class="card-header">Register</h4>
+    <div class="card-body">
+        <AuthorizeView>
+            <NotAuthorized>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input class="form-control" type="text" placeholder="Username" @bind-value="_username"/>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input class="form-control" type="Password" placeholder="Password" @bind-value="_password"/>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input class="form-control" type="Password" placeholder="Confirmation password" @bind-value="_confirmationPassword"/>
+                </div>
+                <div style="color:red">@_errorMessage</div>
+                <button @onclick="PerformRegistration" class =" btn btn-primary mr-1" href="/LoginPage">Register</button> 
+                <NavLink href="/LoginPage" class ="btn btn-link">Login</NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</div>
+</div>
+@code {
+    private string _username;
+    private string _password;
+    private string _confirmationPassword;
+    private string _errorMessage;
+
+    public async Task PerformRegistration() {
+        _errorMessage = "";
+        try {
+            await ((CustomAuthenticationStateProvider)_authenticationStateProvider).ValidateRegister(_username, _password, _confirmationPassword);
+            _username = "";
+            _password = "";
+            _navigationManager.NavigateTo("/Login");
+        }
+        catch (Exception e) {
+            _errorMessage = e.Message;
+        }
+    }
+
+}

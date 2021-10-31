@@ -1,0 +1,11 @@
+@page "/"
+<AuthorizeView>
+    <NotAuthorized>
+        <Login/>
+    </NotAuthorized>
+    <Authorized>
+        <div class="d-flex justify-content-center">
+            <img src="/Images/cshomepage.jpeg" width="600" height="600"/>
+        </div>
+    </Authorized>
+</AuthorizeView>

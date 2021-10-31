@@ -1,0 +1,79 @@
+﻿@page "/AddFamilyMember"
+@using FamilyManager2UI.Data
+@using FamilyManager2UI.WebClient
+@using Models
+@attribute [Authorize(Policy = Policies.IsAdmin)]
+@inject NavigationManager _navMng;
+@inject IRestClient _restClient;
+
+<h3>Add a New Family Member</h3>
+<p>
+    Select the type of member you want to add:
+</p>
+<div class="mb-3">
+    <select name="type" @oninput="@((arg) => ChangeTypeAsync(arg))">
+        <option value="Adult">Adult</option>
+        <option value="Child">Child</option>
+        <option value="Pet">Pet</option>
+    </select>
+</div>
+<div class="mb-3">
+    <button class = "float-right btn btn-outline-dark mb-3" @onclick="AddNewFamily">Create a new Family</button>
+    </div>
+<div class="mb-3">
+    <p>Select the chosen family:</p>
+</div>
+
+@if (_families == null) {
+    <p>
+        <em> Loading ...</em>
+    </p>
+}
+else {
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Members</th>
+            <th>Street Name</th>
+            <th>House Number</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (Family item in _families) {
+            <tr @onclick="@(() => AddNewMember(item.StreetName, item.HouseNumber))" class= "family-row">
+                <td>@item.GetNumberOfMembers()</td>
+                <td>@item.StreetName</td>
+                <td>@item.HouseNumber</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string _type;
+    private IList<Family> _families;
+    
+    protected override async Task OnInitializedAsync() {
+        _type = "Adult";
+        _families = (await _restClient.GetAsync<Family>()).Where(f => f.Adults.Count < 2).ToList();
+    }
+
+    private async Task ChangeTypeAsync(ChangeEventArgs arg) {
+        _type = arg.Value?.ToString();
+        if (_type.Equals("Adult")) {
+            _families = (await _restClient.GetAsync<Family>()).Where(f => f.Adults.Count < 2).ToList();
+        }
+        else {
+            _families = (await _restClient.GetAsync<Family>()).Where(f => f.Adults.Count > 0).ToList();
+        }
+    }
+
+    private void AddNewMember(string streetName,int houseNumber) {
+        _navMng.NavigateTo($"/AddMember/{streetName}/{houseNumber}/{_type}");
+    }
+
+    private void AddNewFamily() {
+        _navMng.NavigateTo("/AddFamily");
+    }
+}

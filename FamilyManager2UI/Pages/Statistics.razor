@@ -1,0 +1,173 @@
+﻿@page "/Statistics"
+@page "/Stats"
+@attribute [Authorize]
+
+@inject IRestClient _restClient;
+
+@using Models
+@using FamilyManager2UI.WebClient
+
+@if (_families == null) {
+    <p>
+        <em> Loading ...</em>
+    </p>
+} else if (!_families.Any()) {
+    <p>
+        <em> No families in the system yet</em>
+    </p>
+} else {
+    <div class="card mb-5">
+        <h1 class="card-header mb-3">Statistics</h1>
+        <div class="card-body row">
+            <div class="col-xl-3 col-md-12">
+                <p>Total number of families: <strong>@_families.Count()</strong></p>
+                <p>Total number of adults: <strong>@_people.Count(p => p is Adult)</strong></p>
+                <p>Total number of children: <strong>@_people.Count(p => p is Child)</strong></p>
+                <p>Total number of pets: <strong>@_families.Sum(f => f.Pets.Count())</strong></p>
+            </div>
+            <div class="col-xl-4 col-md-12">
+                <p>Average number of people per family: <strong>@Math.Round(_families.Average(f => f.Adults.Count() + f.Children.Count()), 2)</strong></p>
+                <p>Average number of adults per family: <strong>@Math.Round(_families.Average(f => f.Adults.Count()), 2)</strong></p>
+                <p>Average number of children per family: <strong>@Math.Round(_families.Average(f => f.Children.Count()), 2)</strong></p>
+                <p>Average number of pets per family: <strong>@Math.Round(_families.Average(f => f.Pets.Count() + f.Children.Sum(c => c.Pets.Count)), 2)</strong></p>
+            </div>
+            <div class="col-xl-5 col-md-12">
+                <p>Total number of families with single parents: <strong>@_families.Count(f => f.Adults.Count() == 1)</strong></p>
+                <p>Total number of people with the last name 'Test': <strong>@_people.Count(p => p.LastName.Equals("Test"))</strong></p>
+                <p>Total number of teachers: <strong>@_people.Count(p => p is Adult adult && adult.JobTitle.JobTitle.Equals("Teacher"))</strong></p>
+                <p>Total number of children with an interest in drawing: <strong>@_people.Count(p => p is Child child && child.Interests.Any(i => i.Type.Equals("Drawing")))</strong></p>
+            </div>
+        </div>
+    </div>
+    
+}
+
+@code {
+    private IList<Family> _families;
+    private IList<Person> _people;
+    
+    private IList<ChartData> _sex;
+    private IList<ChartData> _ages;
+    private IList<ChartData> _hairColors;
+    private IList<ChartData> _eyeColors;
+    private IList<ChartData> _heights;
+    private IList<ChartData> _weights;
+
+    private struct ChartData {
+        public string Name { get; set; }
+        public int Count { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync() {
+        _families = await _restClient.GetAsync<Family>();
+        _people = new List<Person>();
+        foreach (var fam in _families) {
+            foreach (var person in fam.Adults) {
+                _people.Add(person);
+            }
+            foreach (var child in fam.Children) {
+                _people.Add(child);
+            }
+        }
+        
+        _sex = new List<ChartData>();
+        _sex.Add(new ChartData() {
+            Name = "Male",
+            Count = _people.Count(p => p.Sex.Equals("M"))
+        });
+        _sex.Add(new ChartData() {
+            Name = "Female",
+            Count = _people.Count(p => p.Sex.Equals("F"))
+        });
+
+        _ages = new List<ChartData>();
+        _ages.Add(new ChartData() {
+            Name = "<10",
+            Count = _people.Count(p => p.Age < 10)
+        });
+        _ages.Add(new ChartData() {
+            Name = "10-18",
+            Count = _people.Count(p => p.Age is >= 10 and < 19)
+        });
+        _ages.Add(new ChartData() {
+            Name = "19-27",
+            Count = _people.Count(p => p.Age is >= 19 and < 28)
+        });
+        _ages.Add(new ChartData() {
+            Name = "28-40",
+            Count = _people.Count(p => p.Age is >= 28 and < 41)
+        });
+        _ages.Add(new ChartData() {
+            Name = "41-55",
+            Count = _people.Count(p => p.Age is >= 41 and < 56)
+        });
+        _ages.Add(new ChartData() {
+            Name = ">55",
+            Count = _people.Count(p => p.Age > 55)
+        });
+        
+        _hairColors = new List<ChartData>();
+        foreach(var color in await _restClient.GetColorAsync("haircolors")) {
+            _hairColors.Add(new ChartData() {
+                Name = color,
+                Count = _people.Count(p => p.HairColor.Equals(color))
+            });
+        }
+        
+        _eyeColors = new List<ChartData>();
+        foreach (var color in await _restClient.GetColorAsync("eyecolors")) {
+            _eyeColors.Add(new ChartData() {
+                Name = color,
+                Count = _people.Count(p => p.EyeColor.Equals(color))
+            });
+        }
+        
+        _heights = new List<ChartData>();
+        _heights.Add(new ChartData() {
+            Name = "<130",
+            Count = _people.Count(p => p.Height < 130)
+        });
+        _heights.Add(new ChartData() {
+            Name = "130-145",
+            Count = _people.Count(p => p.Height is >= 130 and < 146)
+        });
+        _heights.Add(new ChartData() {
+            Name = "146-160",
+            Count = _people.Count(p => p.Height is >= 146 and < 161)
+        });
+        _heights.Add(new ChartData() {
+            Name = "161-175",
+            Count = _people.Count(p => p.Height is >= 161 and < 176)
+        });
+        _heights.Add(new ChartData() {
+            Name = ">175",
+            Count = _people.Count(p => p.Height is > 175)
+        });
+        
+        _weights = new List<ChartData>();
+        _weights.Add(new ChartData() {
+            Name = "<35",
+            Count = _people.Count(p => p.Weight < 35)
+        });
+        _weights.Add(new ChartData() {
+            Name = "35-49",
+            Count = _people.Count(p => p.Weight is <= 35 and < 50)
+        });
+        _weights.Add(new ChartData() {
+            Name = "50-65",
+            Count = _people.Count(p => p.Weight is >= 50 and < 66)
+        });
+        _weights.Add(new ChartData() {
+            Name = "66-80",
+            Count = _people.Count(p => p.Weight is >= 66 and < 81)
+        });
+        _weights.Add(new ChartData() {
+            Name = "81-95",
+            Count = _people.Count(p => p.Weight is >= 61 and < 96)
+        });
+        _weights.Add(new ChartData() {
+            Name = ">95",
+            Count = _people.Count(p => p.Weight > 95)
+        });
+    }
+}
